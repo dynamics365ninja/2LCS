@@ -31,5 +31,13 @@ namespace LCS.Utils
         {
             return (T)MemoryCache.Default.Get(key);
         }
+
+        public static void Clear()
+        {
+            foreach (var key in MemoryCache.Default.Select(item => item.Key).ToList())
+            {
+                MemoryCache.Default.Remove(key);
+            }
+        }
     }
 }

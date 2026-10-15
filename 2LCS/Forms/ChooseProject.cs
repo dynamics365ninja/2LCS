@@ -1,4 +1,5 @@
-﻿using LCS.JsonObjects;
+﻿using LCS.Theming;
+using LCS.JsonObjects;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class ChooseProject : Form
+    public partial class ChooseProject : LCS.Theming.ThemedForm
     {
         public List<LcsProject> Projects;
         private const int CpNocloseButton = 0x200;
@@ -61,36 +62,38 @@ namespace LCS.Forms
             }
         }
 
-        private void OkButton_Click(object sender, EventArgs e)
+        private async void OkButton_Click(object sender, EventArgs e)
         {
-            if (projectsDataGridView.SelectedRows.Count > 0)
-            {
-                LcsProject = (LcsProject)projectsDataGridView.SelectedRows[0].DataBoundItem;
-                if (LcsProject.RequestPending == true)
-                {
-                    MessageBox.Show(this, $"Invitation to the project {LcsProject.Name} has not been completed yet for your user account.\n\nVisit LCS and accept invitation first!", "Warning! Action needed.");
-                    return;
-                }
-                UpdateProjectLinks();
-            }
-            else
-            {
-                Cancelled = true;
-            }
-            Close();
+            await AcceptSelectionAsync();
         }
 
-        private void ProjectsDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        private async void ProjectsDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            await AcceptSelectionAsync();
+        }
+
+        private async Task AcceptSelectionAsync()
         {
             if (projectsDataGridView.SelectedRows.Count > 0)
             {
                 LcsProject = (LcsProject)projectsDataGridView.SelectedRows[0].DataBoundItem;
                 if (LcsProject.RequestPending == true)
                 {
-                    MessageBox.Show(this, $"Invitation to the project {LcsProject.Name} has not been completed yet for your user account.\n\nVisit LCS and accept invitation first!", "Warning! Action needed.");
+                    FluentMessageBox.Show(this, $"Invitation to the project {LcsProject.Name} has not been completed yet for your user account.\n\nVisit LCS and accept invitation first!", "Warning! Action needed.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                UpdateProjectLinks();
+                UseWaitCursor = true;
+                Enabled = false;
+                try
+                {
+                    await UpdateProjectLinksAsync();
+                }
+                finally
+                {
+                    Enabled = true;
+                    UseWaitCursor = false;
+                }
             }
             else
             {
@@ -101,7 +104,7 @@ namespace LCS.Forms
 
         private void ProjectsDataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (projectsDataGridView.DataSource == null) return;
+            if (projectsDataGridView.DataSource == null || Projects == null) return;
             _projectsSource.DataSource = _sortAscending ? Projects.AsQueryable().OrderBy(projectsDataGridView.Columns[e.ColumnIndex].DataPropertyName).ToList() : Projects.AsQueryable().OrderBy(projectsDataGridView.Columns[e.ColumnIndex].DataPropertyName).Reverse().ToList();
             _sortAscending = !_sortAscending;
         }
@@ -134,10 +137,11 @@ namespace LCS.Forms
             _projectsSource.ResetBindings(false);
         }
 
-        private void UpdateProjectLinks()
+        private async Task UpdateProjectLinksAsync()
         {
-            var projectDetails = HttpClientHelper.GetProject(LcsProject.Id.ToString());
-            if (projectDetails != null)
+            var projectId = LcsProject.Id.ToString();
+            var projectDetails = await Task.Run(() => HttpClientHelper.GetProject(projectId));
+            if (projectDetails?.Settings != null)
             {
                 var project = Projects.FirstOrDefault(prj => prj.Id == LcsProject.Id);
                 project.SharepointSite = projectDetails.Settings.SharepointSite;

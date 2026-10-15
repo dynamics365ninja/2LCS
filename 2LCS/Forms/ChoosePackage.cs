@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class ChoosePackage : Form
+    public partial class ChoosePackage : LCS.Theming.ThemedForm
     {
         public List<DeployablePackage> Packages;
         private const int CpNocloseButton = 0x200;

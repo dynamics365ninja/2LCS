@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using LCS.Auth;
 using LCS.Cache;
 using LCS.JsonObjects;
 using LCS.Utils;
@@ -19,7 +20,8 @@ namespace LCS
     {
         private readonly HttpClient _httpClient;
         private bool _disposed;
-        private StringContent _stringContent;
+        private readonly HttpClient _documentClient;
+        private readonly object _tokenLock = new object();
 
         internal HttpClientHelper(CookieContainer cookieContainer)
         {
@@ -32,10 +34,27 @@ namespace LCS
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
 
-            _httpClient = new HttpClient(httpClientHandler)
+            // Renews an expired session transparently.
+            HttpMessageHandler handler = ReferenceEquals(cookieContainer, LcsSession.Current.Cookies)
+                ? new SessionRenewalHandler(httpClientHandler, LcsSession.Current)
+                : httpClientHandler;
+
+            _httpClient = new HttpClient(handler)
             {
                 Timeout = TimeSpan.FromMinutes(5)
             };
+            // Same pipeline, browser-like headers: the RDP file is only returned to a non-XHR request.
+            _documentClient = new HttpClient(handler, disposeHandler: false)
+            {
+                Timeout = TimeSpan.FromMinutes(5)
+            };
+            _documentClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            _documentClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            _documentClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
+            _documentClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3872.0 Safari/537.36 Edg/78.0.244.0");
+            _documentClient.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
+            _documentClient.DefaultRequestHeaders.Add("cache-control", "no-cache");
+            _documentClient.DefaultRequestHeaders.Add("TimezoneOffset", GetTimeZoneOffsetInMinutes());
 
             _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
             _httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
@@ -68,6 +87,14 @@ namespace LCS
 
         public void ChangeLcsProjectId(string value)
         {
+            lock (LcsSession.Current.SyncRoot)
+            {
+                ChangeLcsProjectIdCore(value);
+            }
+        }
+
+        private void ChangeLcsProjectIdCore(string value)
+        {
             LcsProjectId = value;
             var cookiesLcs = CookieContainer.GetCookies(new Uri(LcsUrl));
             var cookiesUpdateLcs = CookieContainer.GetCookies(new Uri(LcsUpdateUrl));
@@ -89,7 +116,7 @@ namespace LCS
             if (string.IsNullOrEmpty(LcsProjectId)) return;
             CookieContainer.Add(new Uri(LcsUrl), new Cookie("lcspid", LcsProjectId));
             CookieContainer.Add(new Uri(LcsUpdateUrl), new Cookie("lcspid", LcsProjectId));
-            Properties.Settings.Default.cookie = CookieContainer.GetCookieHeader(new Uri(LcsUrl)).Replace(';', ',');
+            LcsSession.StoredCookie = CookieContainer.GetCookieHeader(new Uri(LcsUrl)).Replace(';', ',');
             Properties.Settings.Default.Save();
         }
 
@@ -109,8 +136,9 @@ namespace LCS
 
         public void SetRequestVerificationToken(string url)
         {
-            if (!_httpClient.DefaultRequestHeaders.Contains("__RequestVerificationToken"))
+            lock (_tokenLock)
             {
+                if (_httpClient.DefaultRequestHeaders.Contains("__RequestVerificationToken")) return;
                 var getResponse = _httpClient.GetAsync(url).Result;
                 getResponse.EnsureSuccessStatusCode();
                 var html = getResponse.Content.ReadAsStringAsync().Result;
@@ -136,10 +164,10 @@ namespace LCS
                 parameters = $"lcsEnvironmentId={instance.EnvironmentId}&newRuleName={ruleName}&newRuleIpOrCidr={ipOrCidr}&newRuleService=RDP";
                 url = $"{LcsUrl}/Environment/AddNetworkSecurityRule/{LcsProjectId}";
             }
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = await _httpClient.PostAsync(url, _stringContent);
+                var result = await _httpClient.PostAsync(url, content);
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 var response = JsonConvert.DeserializeObject<Response>(responseBody);
@@ -182,10 +210,10 @@ namespace LCS
         internal async Task<bool> DeleteEnvironment(CloudHostedInstance instance)
         {
             var parameters = $"delete=&ActivityId={instance.ActivityId}&ProductName={WebUtility.UrlEncode(instance.ProductName)}&TopologyName={instance.TopologyName}&TopologyInstanceId={instance.InstanceId}&AzureSubscriptionId={instance.AzureSubscriptionId}&EnvironmentGroup=0&EnvironmentId={instance.EnvironmentId}&PreserveCustomerSignOff=false";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = await _httpClient.PostAsync($"{LcsUrl}/Environment/DeleteEnvironment/{LcsProjectId}", _stringContent);
+                var result = await _httpClient.PostAsync($"{LcsUrl}/Environment/DeleteEnvironment/{LcsProjectId}", content);
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 var response = JsonConvert.DeserializeObject<Response>(responseBody);
@@ -205,10 +233,10 @@ namespace LCS
                 url = $"{LcsUrl}/Environment/DeleteNetworkSecurityRules/{LcsProjectId}";
             }
             var parameters = $"lcsEnvironmentId={instance.EnvironmentId}&rulesToDelete%5B%5D={rule}";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = await _httpClient.PostAsync(url, _stringContent);
+                var result = await _httpClient.PostAsync(url, content);
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 var response = JsonConvert.DeserializeObject<Response>(responseBody);
@@ -243,9 +271,9 @@ namespace LCS
                 };
                 var pagingParamsJson = JsonConvert.SerializeObject(pagingParams, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-                using (_stringContent = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
+                using (var content = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
                 {
-                    var result = await _httpClient.PostAsync($"{LcsUrl}/RainierProject/AllProjectsList", _stringContent);
+                    var result = await _httpClient.PostAsync($"{LcsUrl}/RainierProject/AllProjectsList", content);
                     result.EnsureSuccessStatusCode();
 
                     var responseBody = await result.Content.ReadAsStringAsync();
@@ -286,9 +314,9 @@ namespace LCS
                 };
                 var pagingParamsJson = JsonConvert.SerializeObject(pagingParams, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-                using (_stringContent = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
+                using (var content = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
                 {
-                    var result = _httpClient.PostAsync($"{LcsUrl}/RainierProjectUser/RetrieveProjectUsers/{LcsProjectId}", _stringContent).Result;
+                    var result = _httpClient.PostAsync($"{LcsUrl}/RainierProjectUser/RetrieveProjectUsers/{LcsProjectId}", content).Result;
                     result.EnsureSuccessStatusCode();
 
                     var responseBody = result.Content.ReadAsStringAsync().Result;
@@ -520,9 +548,9 @@ namespace LCS
                 };
                 var pagingParamsJson = JsonConvert.SerializeObject(pagingParams, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-                using (_stringContent = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
+                using (var content = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
                 {
-                    var result = _httpClient.PostAsync(GetPagedDeployablePackageListUrl(instance), _stringContent).Result;
+                    var result = _httpClient.PostAsync(GetPagedDeployablePackageListUrl(instance), content).Result;
                     result.EnsureSuccessStatusCode();
 
                     var responseBody = result.Content.ReadAsStringAsync().Result;
@@ -575,22 +603,13 @@ namespace LCS
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 var rdpPresentResponse = JsonConvert.DeserializeObject<Response>(responseBody);
                 if (!rdpPresentResponse.Success) continue;
-                _httpClient.DefaultRequestHeaders.Remove("Accept");
-                _httpClient.DefaultRequestHeaders.Remove("X-Requested-With");
-                _httpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-                _httpClient.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
 
-                result = _httpClient.GetAsync($"{LcsUrl}/DeploymentPortal/IsRdpResourceAvailable/{LcsProjectId}/?topologyInstanceId={instance.InstanceId}&virtualMachineInstanceName={vm.MachineName}&deploymentItemName={vm.ItemName}&azureSubscriptionId={instance.AzureSubscriptionId}&group=0&isARMTopology={instance.IsARMTopology}&nsgWarningDisplayed=true&_={DateTimeOffset.Now.ToUnixTimeSeconds()}&isDownloadEnabled=True").Result;
+                result = _documentClient.GetAsync($"{LcsUrl}/DeploymentPortal/IsRdpResourceAvailable/{LcsProjectId}/?topologyInstanceId={instance.InstanceId}&virtualMachineInstanceName={vm.MachineName}&deploymentItemName={vm.ItemName}&azureSubscriptionId={instance.AzureSubscriptionId}&group=0&isARMTopology={instance.IsARMTopology}&nsgWarningDisplayed=true&_={DateTimeOffset.Now.ToUnixTimeSeconds()}&isDownloadEnabled=True").Result;
                 result.EnsureSuccessStatusCode();
                 responseBody = result.Content.ReadAsStringAsync().Result;
                 var line1 = responseBody.Split('\r', '\n').FirstOrDefault();
                 if (line1 == null) continue;
                 var splited = line1.Split(':');
-
-                _httpClient.DefaultRequestHeaders.Remove("Accept");
-                _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
-                _httpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-                _httpClient.DefaultRequestHeaders.Remove("Upgrade-Insecure-Requests");
 
                 vm.Credentials = GetCredentials(instance.EnvironmentId, vm.ItemName);
 
@@ -718,10 +737,10 @@ namespace LCS
         internal Response StartSandboxServicing(DeployablePackage package, string platformVersion)
         {
             var parameters = $"package[PackageId]={package.PackageId}&package[Name]={package.Name}&package[Description]={package.Description}&package[packageType]={package.PackageType}&package[ModifiedDate]={package.ModifiedDate}&package[ModifiedBy]={package.ModifiedBy}&package[Publisher]={package.Publisher}&package[Scope]={package.Scope}&package[LcsEnvironmentActionId]={package.LcsEnvironmentActionId}&package[LcsEnvironmentId]={package.LcsEnvironmentId}&package[FileAssetDisplayVersion]={package.FileAssetDisplayVersion}&package[PlatformVersion]={package.PlatformVersion}&package[AppVersion]={package.AppVersion}&package[EstimatedDuration]={package.EstimatedDuration}&platformReleaseName={platformVersion}";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = _httpClient.PostAsync($"{LcsUrl}/Environment/StartSandboxServicing/{LcsProjectId}", _stringContent).Result;
+                var result = _httpClient.PostAsync($"{LcsUrl}/Environment/StartSandboxServicing/{LcsProjectId}", content).Result;
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<Response>(responseBody);
@@ -731,10 +750,10 @@ namespace LCS
         internal async Task<bool> StartStopDeployment(CloudHostedInstance instance, string action)
         {
             var parameters = $"{action}=&ActivityId={instance.ActivityId}&ProductName={WebUtility.UrlEncode(instance.ProductName)}&TopologyName={instance.TopologyName}&TopologyInstanceId={instance.InstanceId}&AzureSubscriptionId={instance.AzureSubscriptionId}&EnvironmentGroup=0&EnvironmentId={instance.EnvironmentId}";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = await _httpClient.PostAsync($"{LcsUrl}/DeploymentPortal/StartStopDeployment/{LcsProjectId}", _stringContent);
+                var result = await _httpClient.PostAsync($"{LcsUrl}/DeploymentPortal/StartStopDeployment/{LcsProjectId}", content);
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 return responseBody == "true";
@@ -744,10 +763,10 @@ namespace LCS
         internal Response ValidateSandboxServicing(DeployablePackage package)
         {
             var parameters = $"package[PackageId]={package.PackageId}&package[Name]={package.Name}&package[Description]={package.Description}&package[packageType]={package.PackageType}&package[ModifiedDate]={package.ModifiedDate}&package[ModifiedBy]={package.ModifiedBy}&package[Publisher]={package.Publisher}&package[Scope]={package.Scope}&package[LcsEnvironmentActionId]={package.LcsEnvironmentActionId}&package[LcsEnvironmentId]={package.LcsEnvironmentId}&package[FileAssetDisplayVersion]={package.FileAssetDisplayVersion}&package[PlatformVersion]={package.PlatformVersion}&package[AppVersion]={package.AppVersion}&package[EstimatedDuration]={package.EstimatedDuration}";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = _httpClient.PostAsync($"{LcsUrl}/Environment/ValidateSandboxServicing/{LcsProjectId}", _stringContent).Result;
+                var result = _httpClient.PostAsync($"{LcsUrl}/Environment/ValidateSandboxServicing/{LcsProjectId}", content).Result;
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 return JsonConvert.DeserializeObject<Response>(responseBody);
@@ -852,10 +871,10 @@ namespace LCS
         internal ServiceRestartResponseData RestartService(CloudHostedInstance instance, string serviceTorestart)
         {
             var parameters = $"lcsEnvironmentId={instance.EnvironmentId}&axServiceName={serviceTorestart}";
-            using (_stringContent = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
+            using (var content = new StringContent(parameters, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = _httpClient.PostAsync($"{LcsUrl}/EnvironmentServicingV2/RestartService/{LcsProjectId}", _stringContent).Result;
+                var result = _httpClient.PostAsync($"{LcsUrl}/EnvironmentServicingV2/RestartService/{LcsProjectId}", content).Result;
                 result.EnsureSuccessStatusCode();
                 var responseBody = result.Content.ReadAsStringAsync().Result;
                 var response = JsonConvert.DeserializeObject<Response>(responseBody);
@@ -890,10 +909,10 @@ namespace LCS
             };
             var pagingParamsJson = JsonConvert.SerializeObject(pagingParams, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            using (_stringContent = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
+            using (var content = new StringContent(pagingParamsJson, Encoding.UTF8, "application/json"))
             {
                 SetRequestVerificationToken($"{LcsUrl}/V2");
-                var result = await _httpClient.PostAsync($"{LcsUrl}/Environment/GetEnvironmentHistoryDetails/{LcsProjectId}?environmentId={instance.EnvironmentId}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}", _stringContent);
+                var result = await _httpClient.PostAsync($"{LcsUrl}/Environment/GetEnvironmentHistoryDetails/{LcsProjectId}?environmentId={instance.EnvironmentId}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}", content);
                 result.EnsureSuccessStatusCode();
                 var settings = new JsonSerializerSettings
                 {
@@ -926,6 +945,7 @@ namespace LCS
             if (disposing)
             {
                 _httpClient?.Dispose();
+                _documentClient?.Dispose();
             }
         }
     }

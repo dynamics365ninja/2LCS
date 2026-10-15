@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class CustomLinks : Form
+    public partial class CustomLinks : LCS.Theming.ThemedForm
     {
         private const int CpNocloseButton = 0x200;
         private readonly BindingSource _linksSource = new BindingSource();

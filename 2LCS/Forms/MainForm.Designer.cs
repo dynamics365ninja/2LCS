@@ -110,7 +110,7 @@
             cookieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             parametersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            tabControl = new System.Windows.Forms.TabControl();
+            tabControl = new LCS.Theming.ModernTabControl();
             cheTabPage = new System.Windows.Forms.TabPage();
             saasTabPage = new System.Windows.Forms.TabPage();
             saasDataGridView = new System.Windows.Forms.DataGridView();
@@ -647,7 +647,7 @@
             // 
             loginToLcsMenuItem.Name = "loginToLcsMenuItem";
             loginToLcsMenuItem.Size = new System.Drawing.Size(105, 24);
-            loginToLcsMenuItem.Text = "&Login to LCS";
+            loginToLcsMenuItem.Text = "&Sign in";
             loginToLcsMenuItem.Click += LoginToLCSMenuItem_Click;
             // 
             // changeProjectMenuItem
@@ -655,7 +655,7 @@
             changeProjectMenuItem.Enabled = false;
             changeProjectMenuItem.Name = "changeProjectMenuItem";
             changeProjectMenuItem.Size = new System.Drawing.Size(177, 24);
-            changeProjectMenuItem.Text = "&Change project context";
+            changeProjectMenuItem.Text = "&Change project";
             changeProjectMenuItem.Click += ChangeProjectMenuItem_Click;
             // 
             // refreshMenuItem
@@ -663,14 +663,14 @@
             refreshMenuItem.Enabled = false;
             refreshMenuItem.Name = "refreshMenuItem";
             refreshMenuItem.Size = new System.Drawing.Size(210, 24);
-            refreshMenuItem.Text = "&Refresh instances for project";
+            refreshMenuItem.Text = "&Refresh";
             refreshMenuItem.Click += RefreshMenuItem_Click;
             // 
             // customLinksToolStripMenuItem
             // 
             customLinksToolStripMenuItem.Name = "customLinksToolStripMenuItem";
             customLinksToolStripMenuItem.Size = new System.Drawing.Size(152, 24);
-            customLinksToolStripMenuItem.Text = "Define c&ustom links";
+            customLinksToolStripMenuItem.Text = "C&ustom links";
             customLinksToolStripMenuItem.Click += CustomLinksToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
@@ -791,7 +791,7 @@
             logoutToolStripMenuItem.Enabled = false;
             logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
             logoutToolStripMenuItem.Size = new System.Drawing.Size(70, 24);
-            logoutToolStripMenuItem.Text = "Logout";
+            logoutToolStripMenuItem.Text = "Sign &out";
             logoutToolStripMenuItem.Click += LogoutToolStripMenuItem_Click;
             // 
             // cookieToolStripMenuItem
@@ -799,13 +799,15 @@
             cookieToolStripMenuItem.Name = "cookieToolStripMenuItem";
             cookieToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             cookieToolStripMenuItem.Text = "Cookie";
+            cookieToolStripMenuItem.ToolTipText = "Edit the LCS session cookie";
             cookieToolStripMenuItem.Click += CookieToolStripMenuItem_Click;
             // 
             // parametersToolStripMenuItem
             // 
             parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
             parametersToolStripMenuItem.Size = new System.Drawing.Size(96, 24);
-            parametersToolStripMenuItem.Text = "Parameters";
+            parametersToolStripMenuItem.Text = "Settings";
+            parametersToolStripMenuItem.ToolTipText = "Settings";
             parametersToolStripMenuItem.Click += ParametersToolStripMenuItem_Click;
             // 
             // aboutToolStripMenuItem
@@ -813,6 +815,7 @@
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
             aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.ToolTipText = "About 2LCS";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // tabControl
@@ -834,7 +837,7 @@
             cheTabPage.Padding = new System.Windows.Forms.Padding(3);
             cheTabPage.Size = new System.Drawing.Size(1307, 756);
             cheTabPage.TabIndex = 0;
-            cheTabPage.Text = "Cloud-hosted instances";
+            cheTabPage.Text = "Cloud-hosted";
             cheTabPage.UseVisualStyleBackColor = true;
             // 
             // saasTabPage
@@ -845,7 +848,7 @@
             saasTabPage.Padding = new System.Windows.Forms.Padding(3);
             saasTabPage.Size = new System.Drawing.Size(1307, 756);
             saasTabPage.TabIndex = 1;
-            saasTabPage.Text = "MS-hosted environments";
+            saasTabPage.Text = "Microsoft-hosted";
             saasTabPage.UseVisualStyleBackColor = true;
             // 
             // saasDataGridView
@@ -1341,7 +1344,7 @@
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Size = new System.Drawing.Size(320, 20);
-            toolStripStatusLabel1.Text = "Right click on an instance to perform an action.";
+            toolStripStatusLabel1.Text = "Right-click an environment to see its actions. Select several rows with the row headers to act on all of them.";
             // 
             // notifyIcon
             // 
@@ -1417,7 +1420,7 @@
         private System.Windows.Forms.MenuStrip mainMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem loginToLcsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem refreshMenuItem;
-        private System.Windows.Forms.TabControl tabControl;
+        private LCS.Theming.ModernTabControl tabControl;
         private System.Windows.Forms.TabPage cheTabPage;
         private System.Windows.Forms.TabPage saasTabPage;
         private System.Windows.Forms.DataGridView saasDataGridView;

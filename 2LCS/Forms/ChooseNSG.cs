@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class ChooseNSG : Form
+    public partial class ChooseNSG : LCS.Theming.ThemedForm
     {
         public NetworkSecurityGroup NetworkSecurityGroup;
         public NSGRule NSGRule;

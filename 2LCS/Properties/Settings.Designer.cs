@@ -262,5 +262,113 @@ namespace LCS.Properties {
                 this["populateOwnIPForNSG"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool keepSessionAlive {
+            get {
+                return ((bool)(this["keepSessionAlive"]));
+            }
+            set {
+                this["keepSessionAlive"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("System")]
+        public string theme {
+            get {
+                return ((string)(this["theme"]));
+            }
+            set {
+                this["theme"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool detailsPaneVisible {
+            get {
+                return ((bool)(this["detailsPaneVisible"]));
+            }
+            set {
+                this["detailsPaneVisible"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string gridLayout {
+            get {
+                return ((string)(this["gridLayout"]));
+            }
+            set {
+                this["gridLayout"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string windowPlacement {
+            get {
+                return ((string)(this["windowPlacement"]));
+            }
+            set {
+                this["windowPlacement"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int lastTab {
+            get {
+                return ((int)(this["lastTab"]));
+            }
+            set {
+                this["lastTab"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastFilter {
+            get {
+                return ((string)(this["lastFilter"]));
+            }
+            set {
+                this["lastFilter"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool azureVmState {
+            get {
+                return ((bool)(this["azureVmState"]));
+            }
+            set {
+                this["azureVmState"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int vmStateRefreshMinutes {
+            get {
+                return ((int)(this["vmStateRefreshMinutes"]));
+            }
+            set {
+                this["vmStateRefreshMinutes"] = value;
+            }
+        }
     }
 }

@@ -149,6 +149,19 @@ namespace LCS.JsonObjects
 
     public class CloudHostedInstance
     {
+        // Read from Azure (LCS only knows about actions done in LCS); never persisted.
+        [Newtonsoft.Json.JsonIgnore]
+        public string VmState { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string VmStateDetail { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public bool VmStateMismatch { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public bool VmStateChanging { get; set; }
+
         public string ActivityId { get; set; }
         public string AzureSubscriptionId { get; set; }
         public string BuildInfo { get; set; }

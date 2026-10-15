@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    partial class About2LCS : Form
+    partial class About2LCS : LCS.Theming.ThemedForm
     {
         public About2LCS()
         {
@@ -16,7 +16,7 @@ namespace LCS.Forms
             this.labelCompanyName.Text = AssemblyCompany;
             this.textBoxDescription.Text = AssemblyDescription;
             this.linkLabelRepository.Text = AssemblyRepositoryLink;
-            this.logoPictureBox.Image = Properties.Resources.favicon_white.ToBitmap();
+            this.logoPictureBox.Image = LCS.Theming.AppLogo.Render(LogicalToDeviceUnits(96));
             this.logoPictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
         }
 

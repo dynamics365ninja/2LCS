@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class ChooseService : Form
+    public partial class ChooseService : LCS.Theming.ThemedForm
     {
         public List<ServiceToRestart> AvailableServices;
         public List<ServiceToRestart> ServicesToRestart;

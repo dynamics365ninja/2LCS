@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class CookieEdit : Form
+    public partial class CookieEdit : LCS.Theming.ThemedForm
     {
         private const int CpNocloseButton = 0x200;
 
@@ -33,7 +33,7 @@ namespace LCS.Forms
 
         private void CookieEdit_Load(object sender, EventArgs e)
         {
-            cookieTextBox.Text = Properties.Settings.Default.cookie;
+            cookieTextBox.Text = Auth.LcsSession.StoredCookie;
         }
 
         private void OkButton_Click(object sender, EventArgs e)

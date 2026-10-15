@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class UpcomingUpdates : Form
+    public partial class UpcomingUpdates : LCS.Theming.ThemedForm
     {
         public List<UpcomingCalendarViewModels> Calendar;
         private readonly BindingSource _calendarSource = new BindingSource();

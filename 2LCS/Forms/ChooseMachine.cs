@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class ChooseMachine : Form
+    public partial class ChooseMachine : LCS.Theming.ThemedForm
     {
         public RDPConnectionDetails RDPConnection;
         public List<RDPConnectionDetails> RDPConnections;

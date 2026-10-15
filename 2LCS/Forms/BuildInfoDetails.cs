@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class BuildInfoDetailsForm : Form
+    public partial class BuildInfoDetailsForm : LCS.Theming.ThemedForm
     {
         public BuildInfoDetails BuildInfo;
         private readonly BindingSource _buildInfoSource = new BindingSource();

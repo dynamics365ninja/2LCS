@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class Credentials : Form
+    public partial class Credentials : LCS.Theming.ThemedForm
     {
         public Credentials()
         {

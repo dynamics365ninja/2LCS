@@ -1,4 +1,5 @@
-﻿using LCS.Utils;
+﻿using LCS.Security;
+using LCS.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +21,9 @@ namespace LCS.Cache
             return CacheUtil.Get<Dictionary<string, string>>(environmentId);
         }
 
+        // Encrypted with DPAPI. The plain-text temp file of older versions (cachingStore) is migrated and deleted.
+        private static string StorePath => Path.Combine(LocalProtection.DataFolder, "credentials.dat");
+
         public static void SaveCredentialsOffline()
         {
             var EnvironmentCredentialCache = new CredentialsStore();
@@ -33,56 +37,43 @@ namespace LCS.Cache
                 });
             });
 
-            var tempFile = Properties.Settings.Default.cachingStore;
-
-            if (string.IsNullOrEmpty(tempFile))
+            if (EnvironmentCredentialCache.EnvironmentCredentials.Count == 0)
             {
-                tempFile = Path.GetTempFileName();
-
-                try
-                {
-                    using var creationStream = File.Create(tempFile);
-
-                    Properties.Settings.Default.cachingStore = tempFile;
-                    Properties.Settings.Default.Save();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                DeleteStore();
+                return;
             }
-
-            if(File.Exists(tempFile))
-            {
-                using(var writer = new StreamWriter(tempFile))
-                {
-                    writer.Write(JsonConvert.SerializeObject(EnvironmentCredentialCache));
-                }
-            }
+            LocalProtection.WriteProtectedFile(StorePath, JsonConvert.SerializeObject(EnvironmentCredentialCache));
+            DeleteLegacyStore();
         }
 
         public static void LoadOffLineCredentials()
         {
-            CredentialsStore store;
-
-            var tempFile = Properties.Settings.Default.cachingStore;
-
-            if (string.IsNullOrEmpty(tempFile))
-                return;
-
-            if (!File.Exists(tempFile))
-                return;
-
             try
             {
-                using (var reader = new StreamReader(tempFile))
+                string cache = null;
+                if (File.Exists(StorePath))
                 {
-                    var cache = reader.ReadToEnd();
-
-                    store = JsonConvert.DeserializeObject<CredentialsStore>(cache);
-
-                    store.RebuildMemCache();
+                    cache = LocalProtection.ReadProtectedFile(StorePath);
                 }
+                else
+                {
+                    var legacyFile = Properties.Settings.Default.cachingStore;
+                    if (!string.IsNullOrEmpty(legacyFile) && File.Exists(legacyFile))
+                    {
+                        cache = File.ReadAllText(legacyFile);
+                    }
+                }
+                if (cache == null) return;
+
+                var store = JsonConvert.DeserializeObject<CredentialsStore>(cache);
+                store?.RebuildMemCache();
+
+                if (!File.Exists(StorePath))
+                {
+                    // Migrate the plain text cache of an older version.
+                    LocalProtection.WriteProtectedFile(StorePath, cache);
+                }
+                DeleteLegacyStore();
             }
             catch (Exception)
             {
@@ -92,8 +83,52 @@ namespace LCS.Cache
             }
         }
 
+        // Removes the stored cache (encrypted file and the plain-text file of older versions).
+        public static void DeleteStore()
+        {
+            try
+            {
+                if (File.Exists(StorePath)) File.Delete(StorePath);
+            }
+            catch (IOException)
+            {
+                // Best effort.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Best effort.
+            }
+            DeleteLegacyStore();
+        }
+
+        private static void DeleteLegacyStore()
+        {
+            var legacyFile = Properties.Settings.Default.cachingStore;
+            if (string.IsNullOrEmpty(legacyFile)) return;
+            try
+            {
+                // Temp file names are reused - only delete a file that really is a 2LCS cache.
+                if (File.Exists(legacyFile) && File.ReadAllText(legacyFile).TrimStart().StartsWith("{\"EnvironmentCredentials\"", StringComparison.Ordinal))
+                {
+                    File.Delete(legacyFile);
+                }
+            }
+            catch (IOException)
+            {
+                return;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return;
+            }
+            Properties.Settings.Default.cachingStore = "";
+            Properties.Settings.Default.Save();
+        }
+
         public static void DisableCache()
         {
+            // No cached passwords on disk once caching is off.
+            DeleteStore();
             Properties.Settings.Default.cachingEnabled = false;
             Properties.Settings.Default.keepCache = false;
             Properties.Settings.Default.cachingStore = "";
@@ -103,17 +138,13 @@ namespace LCS.Cache
 
         public static string ClearCache()
         {
-            var tempFile = Properties.Settings.Default.cachingStore;
-
-            if (string.IsNullOrEmpty(tempFile))
-                return null;
-
             try
             {
-                File.Delete(tempFile);
-                Properties.Settings.Default.cachingStore = "";
-                Properties.Settings.Default.Save();
-                
+                // Also the in-memory entries - they would be written back when 2LCS closes.
+                CacheUtil.Clear();
+                if (File.Exists(StorePath)) File.Delete(StorePath);
+                DeleteLegacyStore();
+
                 return null;
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using LCS.Theming;
+using AutoMapper;
 using CsvHelper;
 using LCS.JsonObjects;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -9,11 +10,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LCS.AssetLibrary;
 
-public partial class AssetLibrarySearch : Form
+public partial class AssetLibrarySearch : LCS.Theming.ThemedForm
 {
     private HttpClientHelper _httpClientHelper;
 
@@ -29,11 +31,27 @@ public partial class AssetLibrarySearch : Form
         assetsCreatedBefore.Value = DateTime.Now;
     }
 
-    private void search_Click(object sender, EventArgs e)
+    private async void search_Click(object sender, EventArgs e)
     {
-        Cursor.Current = Cursors.WaitCursor;
+        // Requests run in the background so the progress is visible.
+        search.Enabled = false;
+        UseWaitCursor = true;
+        try
+        {
+            await SearchAndExportAsync();
+        }
+        finally
+        {
+            UseWaitCursor = false;
+            search.Enabled = true;
+        }
+    }
 
-        var assets = _httpClientHelper.GetSharedAssetList(AssetFileType.NuGetPackage);
+    private async Task SearchAndExportAsync()
+    {
+        var assets = await Task.Run(() => _httpClientHelper.GetSharedAssetList(AssetFileType.NuGetPackage));
+        // The window can be closed while LCS is queried.
+        if (IsDisposed || assets == null) return;
 
         var assetVersionsForExportList = new List<AssetVersionForExport>();
 
@@ -49,7 +67,9 @@ public partial class AssetLibrarySearch : Form
             assetExportProgress.Value++;
             assetExportProgressNumberOfMax.Text = $"{assetExportProgress.Value} of {assetExportProgress.Maximum}";
             assetExportProgressAssetName.Text = asset.Name;
-            var assetVersions = _httpClientHelper.GetSharedAssetVersionList(asset.ParentAssetId)
+            var versionList = await Task.Run(() => _httpClientHelper.GetSharedAssetVersionList(asset.ParentAssetId));
+            if (IsDisposed) return;
+            var assetVersions = (versionList ?? new List<AssetVersion>())
                 .Where(assetVersion => assetVersion.CreatedDate >= assetsCreatedAfter.Value
                                     && assetVersion.CreatedDate <= assetsCreatedBefore.Value);
             if (assetVersions.Any() == false)
@@ -63,9 +83,8 @@ public partial class AssetLibrarySearch : Form
                     assetVersion.ApplicationOrPlatformVersion = fileDescription;
                     return mapper.Map<AssetVersionForExport>(assetVersion);
                 }));
-;       }
+        }
 
-        Cursor.Current = Cursors.Default;
         assetExportProgress.Value = 0;
         assetExportProgressNumberOfMax.Text = string.Empty;
         assetExportProgressAssetName.Text = string.Empty;
@@ -86,7 +105,7 @@ public partial class AssetLibrarySearch : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message);
+                FluentMessageBox.Show(this, ex.Message);
             }
         }
     }

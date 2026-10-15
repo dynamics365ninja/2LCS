@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class LogDisplay : Form
+    public partial class LogDisplay : LCS.Theming.ThemedForm
     {
         public LogDisplay()
         {

@@ -1,20 +1,32 @@
-﻿using System;
+﻿using LCS.Theming;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class AddNsg : Form
+    public partial class AddNsg : LCS.Theming.ThemedForm
     {
         private const int CpNocloseButton = 0x200;
+
+        // HTTPS - the address ends up in a firewall rule.
+        private static readonly HttpClient IpLookupClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        private const string IpLookupUrl = "https://ipv4.icanhazip.com";
 
         public AddNsg()
         {
             InitializeComponent();
+        }
 
-            PopulateWithOwnIP();
+        protected override async void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            await PopulateWithOwnIPAsync();
         }
 
         public bool Cancelled { get; private set; }
@@ -48,24 +60,26 @@ namespace LCS.Forms
             Close();
         }
 
-        private void PopulateWithOwnIP()
+        private async Task PopulateWithOwnIPAsync()
         {
-            if (Properties.Settings.Default.populateOwnIPForNSG)
+            if (!Properties.Settings.Default.populateOwnIPForNSG) return;
+            try
             {
-                try
+                var response = (await IpLookupClient.GetStringAsync(IpLookupUrl)).Trim();
+                // Only a plain IPv4 address goes into the rule.
+                if (IPAddress.TryParse(response, out var address) && address.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    var ownIpAddress = new HttpClient().GetStringAsync("http://icanhazip.com").Result;
-                    ownIpAddress = ownIpAddress.Replace("\\r\\n", "").Replace("\\n", "").Trim();
-
-                    if (!string.IsNullOrEmpty(ownIpAddress))
-                    {
-                        textBox2.Text = ownIpAddress;
-                    }
+                    if (string.IsNullOrEmpty(textBox2.Text)) textBox2.Text = address.ToString();
+                    return;
                 }
-                catch
-                {
-                    MessageBox.Show(this, "Failed to get your IP address. Please enter it manually.");
-                }
+            }
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
+            {
+                // Reported below.
+            }
+            if (!IsDisposed && string.IsNullOrEmpty(textBox2.Text))
+            {
+                FluentMessageBox.Show(this, "Failed to get your IP address. Please enter it manually.");
             }
         }
 
@@ -73,12 +87,12 @@ namespace LCS.Forms
         {
             if (string.IsNullOrEmpty(textBox1.Text))
             {
-                MessageBox.Show(this, "Rule name is empty.");
+                FluentMessageBox.Show(this, "Rule name is empty.");
                 return false;
             }
             if (string.IsNullOrEmpty(textBox2.Text))
             {
-                MessageBox.Show(this, "IP address field is empty.");
+                FluentMessageBox.Show(this, "IP address field is empty.");
                 return false;
             }
             Rule = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

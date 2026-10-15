@@ -1,4 +1,5 @@
-﻿using LCS.Forms;
+﻿using LCS.Theming;
+using LCS.Forms;
 using LCS.JsonObjects;
 using Microsoft.Win32;
 using System;
@@ -48,7 +49,7 @@ namespace LCS
             { 
                 Registry.ClassesRoot.DeleteSubKeyTree(URI_PROTOCOL_NAME, false);            
                 
-                MessageBox.Show($"{URI_PROTOCOL_NAME} protocol handler registration removed.");
+                FluentMessageBox.Show($"{URI_PROTOCOL_NAME} protocol handler registration removed.");
                 retVal = true;
             }
             return retVal;
@@ -81,7 +82,7 @@ namespace LCS
                            .SetValue("", $@"""{appAssemblyLocation}"" ""%1""");
                 }
 
-                MessageBox.Show($"{URI_PROTOCOL_NAME} protocol  handler registration completed.\nRemember to not move the executable to other location or re-register it after.");
+                FluentMessageBox.Show($"{URI_PROTOCOL_NAME} protocol  handler registration completed.\nRemember to not move the executable to other location or re-register it after.");
                 retVal = true;
             }
             return  retVal;
@@ -93,7 +94,7 @@ namespace LCS
 
             if (!isAdmin)
             {
-                MessageBox.Show("You must be system administrator", "Insufficient privilidges", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FluentMessageBox.Show("You must be system administrator", "Insufficient privilidges", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return isAdmin;

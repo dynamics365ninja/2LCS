@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class EnvironmentChanges : Form
+    public partial class EnvironmentChanges : LCS.Theming.ThemedForm
     {
         public List<ActionDetails> ActionDetails;
         private readonly BindingSource _actionDetailsSource = new BindingSource();

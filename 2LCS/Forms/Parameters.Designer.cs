@@ -1,4 +1,4 @@
-﻿namespace LCS.Forms
+namespace LCS.Forms
 {
     partial class Parameters
     {
@@ -28,382 +28,157 @@
         /// </summary>
         private void InitializeComponent()
         {
-            AutoRefreshCheckBox = new System.Windows.Forms.CheckBox();
+            page = new LCS.Theming.SettingsPage();
+            footer = new System.Windows.Forms.Panel();
             closeButton = new System.Windows.Forms.Button();
-            groupBoxExportConfig = new System.Windows.Forms.GroupBox();
-            labelOrgNameExcl = new System.Windows.Forms.Label();
-            textBoxProjectExcl = new System.Windows.Forms.TextBox();
-            groupBoxUIConfig = new System.Windows.Forms.GroupBox();
-            minimizeToNotificationArea = new System.Windows.Forms.CheckBox();
-            groupBoxCaching = new System.Windows.Forms.GroupBox();
+            themeComboBox = new System.Windows.Forms.ComboBox();
+            keepSessionAliveCheckBox = new LCS.Theming.ToggleSwitch();
+            AutoRefreshCheckBox = new LCS.Theming.ToggleSwitch();
+            minimizeToNotificationArea = new LCS.Theming.ToggleSwitch();
+            CachingEnabledCheckbox = new LCS.Theming.ToggleSwitch();
+            StoreCacheCheckBox = new LCS.Theming.ToggleSwitch();
             ClearCacheButton = new System.Windows.Forms.Button();
-            StoreCacheCheckBox = new System.Windows.Forms.CheckBox();
-            CachingEnabledCheckbox = new System.Windows.Forms.CheckBox();
-            groupCHE = new System.Windows.Forms.GroupBox();
-            uriSchemeEnabled = new System.Windows.Forms.CheckBox();
-            alwaysLogAsAdmin = new System.Windows.Forms.CheckBox();
-            groupBoxCredentials = new System.Windows.Forms.GroupBox();
-            LocalCredentialsCheckbox = new System.Windows.Forms.CheckBox();
-            RDPCredentialsCheckbox = new System.Windows.Forms.CheckBox();
-            groupBoxLCSUrls = new System.Windows.Forms.GroupBox();
-            labelLcsDiagUrl = new System.Windows.Forms.Label();
-            labelLcsFixUrl = new System.Windows.Forms.Label();
-            labelLcsUpdateUrl = new System.Windows.Forms.Label();
-            labelLcsUrl = new System.Windows.Forms.Label();
-            textBoxLcsDiagUrl = new System.Windows.Forms.TextBox();
-            textBoxLcsFixUrl = new System.Windows.Forms.TextBox();
-            textBoxLcsUpdateUrl = new System.Windows.Forms.TextBox();
+            textBoxProjectExcl = new System.Windows.Forms.TextBox();
+            RDPCredentialsCheckbox = new LCS.Theming.ToggleSwitch();
+            LocalCredentialsCheckbox = new LCS.Theming.ToggleSwitch();
+            alwaysLogAsAdmin = new LCS.Theming.ToggleSwitch();
+            uriSchemeEnabled = new LCS.Theming.ToggleSwitch();
+            addExternalIpAddress = new LCS.Theming.ToggleSwitch();
+            azureVmStateCheckBox = new LCS.Theming.ToggleSwitch();
+            vmRefreshComboBox = new System.Windows.Forms.ComboBox();
             textBoxLcsUrl = new System.Windows.Forms.TextBox();
-            groupBox1 = new System.Windows.Forms.GroupBox();
-            addExternalIpAddress = new System.Windows.Forms.CheckBox();
-            groupBoxExportConfig.SuspendLayout();
-            groupBoxUIConfig.SuspendLayout();
-            groupBoxCaching.SuspendLayout();
-            groupCHE.SuspendLayout();
-            groupBoxCredentials.SuspendLayout();
-            groupBoxLCSUrls.SuspendLayout();
-            groupBox1.SuspendLayout();
+            textBoxLcsUpdateUrl = new System.Windows.Forms.TextBox();
+            textBoxLcsFixUrl = new System.Windows.Forms.TextBox();
+            textBoxLcsDiagUrl = new System.Windows.Forms.TextBox();
+            footer.SuspendLayout();
             SuspendLayout();
-            // 
-            // AutoRefreshCheckBox
-            // 
-            AutoRefreshCheckBox.AutoSize = true;
-            AutoRefreshCheckBox.Location = new System.Drawing.Point(8, 25);
-            AutoRefreshCheckBox.Name = "AutoRefreshCheckBox";
-            AutoRefreshCheckBox.Size = new System.Drawing.Size(371, 24);
-            AutoRefreshCheckBox.TabIndex = 0;
-            AutoRefreshCheckBox.Text = "Auto-refresh list of instances after switching project";
-            AutoRefreshCheckBox.UseVisualStyleBackColor = true;
-            // 
+            //
+            // page
+            //
+            page.Dock = System.Windows.Forms.DockStyle.Fill;
+            page.Name = "page";
+            page.Padding = new System.Windows.Forms.Padding(24, 8, 24, 16);
+            page.TabIndex = 0;
+            //
+            // footer
+            //
+            footer.Controls.Add(closeButton);
+            footer.Dock = System.Windows.Forms.DockStyle.Bottom;
+            footer.Name = "footer";
+            footer.Size = new System.Drawing.Size(640, 64);
+            footer.TabIndex = 1;
+            //
             // closeButton
-            // 
-            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            closeButton.Location = new System.Drawing.Point(304, 801);
+            //
+            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            closeButton.Location = new System.Drawing.Point(496, 16);
             closeButton.Name = "closeButton";
-            closeButton.Size = new System.Drawing.Size(163, 32);
-            closeButton.TabIndex = 4;
+            closeButton.Size = new System.Drawing.Size(120, 32);
+            closeButton.TabIndex = 0;
             closeButton.Text = "Close";
-            closeButton.UseVisualStyleBackColor = true;
             closeButton.Click += OkButton_Click;
-            // 
-            // groupBoxExportConfig
-            // 
-            groupBoxExportConfig.Controls.Add(labelOrgNameExcl);
-            groupBoxExportConfig.Controls.Add(textBoxProjectExcl);
-            groupBoxExportConfig.Location = new System.Drawing.Point(12, 223);
-            groupBoxExportConfig.Name = "groupBoxExportConfig";
-            groupBoxExportConfig.Size = new System.Drawing.Size(463, 91);
-            groupBoxExportConfig.TabIndex = 5;
-            groupBoxExportConfig.TabStop = false;
-            groupBoxExportConfig.Text = "Export instances/updates";
-            // 
-            // labelOrgNameExcl
-            // 
-            labelOrgNameExcl.Location = new System.Drawing.Point(4, 31);
-            labelOrgNameExcl.Name = "labelOrgNameExcl";
-            labelOrgNameExcl.Size = new System.Drawing.Size(241, 43);
-            labelOrgNameExcl.TabIndex = 1;
-            labelOrgNameExcl.Text = "Exclude projects for all organizations containing the following string\r\n\r\n";
-            // 
-            // textBoxProjectExcl
-            // 
-            textBoxProjectExcl.Location = new System.Drawing.Point(251, 38);
-            textBoxProjectExcl.Name = "textBoxProjectExcl";
-            textBoxProjectExcl.Size = new System.Drawing.Size(209, 27);
-            textBoxProjectExcl.TabIndex = 0;
-            // 
-            // groupBoxUIConfig
-            // 
-            groupBoxUIConfig.Controls.Add(minimizeToNotificationArea);
-            groupBoxUIConfig.Controls.Add(AutoRefreshCheckBox);
-            groupBoxUIConfig.Location = new System.Drawing.Point(12, 11);
-            groupBoxUIConfig.Name = "groupBoxUIConfig";
-            groupBoxUIConfig.Size = new System.Drawing.Size(463, 102);
-            groupBoxUIConfig.TabIndex = 6;
-            groupBoxUIConfig.TabStop = false;
-            groupBoxUIConfig.Text = "UI";
-            // 
-            // minimizeToNotificationArea
-            // 
-            minimizeToNotificationArea.AutoSize = true;
-            minimizeToNotificationArea.Location = new System.Drawing.Point(8, 57);
-            minimizeToNotificationArea.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            //
+            // themeComboBox
+            //
+            themeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            themeComboBox.Items.AddRange(new object[] { "Use Windows setting", "Light", "Dark" });
+            themeComboBox.Name = "themeComboBox";
+            themeComboBox.Size = new System.Drawing.Size(200, 28);
+            //
+            // toggles
+            //
+            keepSessionAliveCheckBox.Name = "keepSessionAliveCheckBox";
+            keepSessionAliveCheckBox.Text = "Keep me signed in";
+            AutoRefreshCheckBox.Name = "AutoRefreshCheckBox";
+            AutoRefreshCheckBox.Text = "Refresh environments after switching project";
             minimizeToNotificationArea.Name = "minimizeToNotificationArea";
-            minimizeToNotificationArea.Size = new System.Drawing.Size(363, 24);
-            minimizeToNotificationArea.TabIndex = 2;
-            minimizeToNotificationArea.Text = "Closing the window minimizes to notification area";
-            minimizeToNotificationArea.UseVisualStyleBackColor = true;
-            // 
-            // groupBoxCaching
-            // 
-            groupBoxCaching.Controls.Add(ClearCacheButton);
-            groupBoxCaching.Controls.Add(StoreCacheCheckBox);
-            groupBoxCaching.Controls.Add(CachingEnabledCheckbox);
-            groupBoxCaching.Location = new System.Drawing.Point(12, 118);
-            groupBoxCaching.Name = "groupBoxCaching";
-            groupBoxCaching.Size = new System.Drawing.Size(463, 98);
-            groupBoxCaching.TabIndex = 7;
-            groupBoxCaching.TabStop = false;
-            groupBoxCaching.Text = "Caching";
-            // 
-            // ClearCacheButton
-            // 
-            ClearCacheButton.Location = new System.Drawing.Point(315, 49);
-            ClearCacheButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            ClearCacheButton.Name = "ClearCacheButton";
-            ClearCacheButton.Size = new System.Drawing.Size(141, 35);
-            ClearCacheButton.TabIndex = 2;
-            ClearCacheButton.Text = "Clear cache";
-            ClearCacheButton.UseVisualStyleBackColor = true;
-            ClearCacheButton.Click += ClearCacheButton_Click;
-            // 
-            // StoreCacheCheckBox
-            // 
-            StoreCacheCheckBox.AutoSize = true;
-            StoreCacheCheckBox.Location = new System.Drawing.Point(8, 57);
-            StoreCacheCheckBox.Name = "StoreCacheCheckBox";
-            StoreCacheCheckBox.Size = new System.Drawing.Size(287, 24);
-            StoreCacheCheckBox.TabIndex = 1;
-            StoreCacheCheckBox.Text = "Save cache on exit and load on startup";
-            StoreCacheCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // CachingEnabledCheckbox
-            // 
-            CachingEnabledCheckbox.AutoSize = true;
-            CachingEnabledCheckbox.Location = new System.Drawing.Point(8, 25);
+            minimizeToNotificationArea.Text = "Closing the window minimizes to the notification area";
             CachingEnabledCheckbox.Name = "CachingEnabledCheckbox";
-            CachingEnabledCheckbox.Size = new System.Drawing.Size(154, 24);
-            CachingEnabledCheckbox.TabIndex = 0;
-            CachingEnabledCheckbox.Text = "Enabled (memory)";
-            CachingEnabledCheckbox.UseVisualStyleBackColor = true;
+            CachingEnabledCheckbox.Text = "Cache credentials";
             CachingEnabledCheckbox.CheckedChanged += CachingEnabledCheckbox_CheckedChanged;
-            // 
-            // groupCHE
-            // 
-            groupCHE.Controls.Add(uriSchemeEnabled);
-            groupCHE.Controls.Add(alwaysLogAsAdmin);
-            groupCHE.Location = new System.Drawing.Point(12, 433);
-            groupCHE.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            groupCHE.Name = "groupCHE";
-            groupCHE.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            groupCHE.Size = new System.Drawing.Size(461, 108);
-            groupCHE.TabIndex = 9;
-            groupCHE.TabStop = false;
-            groupCHE.Text = "Cloud-hosted environments";
-            // 
-            // uriSchemeEnabled
-            // 
-            uriSchemeEnabled.Location = new System.Drawing.Point(8, 65);
+            StoreCacheCheckBox.Name = "StoreCacheCheckBox";
+            StoreCacheCheckBox.Text = "Keep the cache between sessions";
+            RDPCredentialsCheckbox.Name = "RDPCredentialsCheckbox";
+            RDPCredentialsCheckbox.Text = "Include RDP credentials";
+            LocalCredentialsCheckbox.Name = "LocalCredentialsCheckbox";
+            LocalCredentialsCheckbox.Text = "Include local credentials";
+            alwaysLogAsAdmin.Name = "alwaysLogAsAdmin";
+            alwaysLogAsAdmin.Text = "Always connect as the admin user";
             uriSchemeEnabled.Name = "uriSchemeEnabled";
-            uriSchemeEnabled.Size = new System.Drawing.Size(225, 31);
-            uriSchemeEnabled.TabIndex = 1;
             uriSchemeEnabled.Text = "Enable URI scheme support";
             uriSchemeEnabled.CheckedChanged += OnUriSchemeEnabledCheckedChanged;
-            // 
-            // alwaysLogAsAdmin
-            // 
-            alwaysLogAsAdmin.Location = new System.Drawing.Point(8, 28);
-            alwaysLogAsAdmin.Name = "alwaysLogAsAdmin";
-            alwaysLogAsAdmin.Size = new System.Drawing.Size(204, 31);
-            alwaysLogAsAdmin.TabIndex = 0;
-            alwaysLogAsAdmin.Text = "Always log as admin user";
-            // 
-            // groupBoxCredentials
-            // 
-            groupBoxCredentials.Controls.Add(LocalCredentialsCheckbox);
-            groupBoxCredentials.Controls.Add(RDPCredentialsCheckbox);
-            groupBoxCredentials.Location = new System.Drawing.Point(11, 320);
-            groupBoxCredentials.Name = "groupBoxCredentials";
-            groupBoxCredentials.Size = new System.Drawing.Size(463, 105);
-            groupBoxCredentials.TabIndex = 6;
-            groupBoxCredentials.TabStop = false;
-            groupBoxCredentials.Text = "Export project data";
-            // 
-            // LocalCredentialsCheckbox
-            // 
-            LocalCredentialsCheckbox.Location = new System.Drawing.Point(8, 63);
-            LocalCredentialsCheckbox.Name = "LocalCredentialsCheckbox";
-            LocalCredentialsCheckbox.Size = new System.Drawing.Size(204, 31);
-            LocalCredentialsCheckbox.TabIndex = 2;
-            LocalCredentialsCheckbox.Text = "Include local credentials";
-            // 
-            // RDPCredentialsCheckbox
-            // 
-            RDPCredentialsCheckbox.Location = new System.Drawing.Point(8, 26);
-            RDPCredentialsCheckbox.Name = "RDPCredentialsCheckbox";
-            RDPCredentialsCheckbox.Size = new System.Drawing.Size(204, 31);
-            RDPCredentialsCheckbox.TabIndex = 1;
-            RDPCredentialsCheckbox.Text = "Include RDP credentials";
-            // 
-            // groupBoxLCSUrls
-            // 
-            groupBoxLCSUrls.Controls.Add(labelLcsDiagUrl);
-            groupBoxLCSUrls.Controls.Add(labelLcsFixUrl);
-            groupBoxLCSUrls.Controls.Add(labelLcsUpdateUrl);
-            groupBoxLCSUrls.Controls.Add(labelLcsUrl);
-            groupBoxLCSUrls.Controls.Add(textBoxLcsDiagUrl);
-            groupBoxLCSUrls.Controls.Add(textBoxLcsFixUrl);
-            groupBoxLCSUrls.Controls.Add(textBoxLcsUpdateUrl);
-            groupBoxLCSUrls.Controls.Add(textBoxLcsUrl);
-            groupBoxLCSUrls.Location = new System.Drawing.Point(12, 624);
-            groupBoxLCSUrls.Name = "groupBoxLCSUrls";
-            groupBoxLCSUrls.Size = new System.Drawing.Size(460, 165);
-            groupBoxLCSUrls.TabIndex = 10;
-            groupBoxLCSUrls.TabStop = false;
-            groupBoxLCSUrls.Text = "LCS Urls";
-            // 
-            // labelLcsDiagUrl
-            // 
-            labelLcsDiagUrl.AutoSize = true;
-            labelLcsDiagUrl.Location = new System.Drawing.Point(9, 132);
-            labelLcsDiagUrl.Name = "labelLcsDiagUrl";
-            labelLcsDiagUrl.Size = new System.Drawing.Size(130, 20);
-            labelLcsDiagUrl.TabIndex = 7;
-            labelLcsDiagUrl.Text = "LCS Diagnostic Url";
-            // 
-            // labelLcsFixUrl
-            // 
-            labelLcsFixUrl.AutoSize = true;
-            labelLcsFixUrl.Location = new System.Drawing.Point(9, 99);
-            labelLcsFixUrl.Name = "labelLcsFixUrl";
-            labelLcsFixUrl.Size = new System.Drawing.Size(139, 20);
-            labelLcsFixUrl.TabIndex = 6;
-            labelLcsFixUrl.Text = "LCS Issue Search Url";
-            // 
-            // labelLcsUpdateUrl
-            // 
-            labelLcsUpdateUrl.AutoSize = true;
-            labelLcsUpdateUrl.Location = new System.Drawing.Point(9, 66);
-            labelLcsUpdateUrl.Name = "labelLcsUpdateUrl";
-            labelLcsUpdateUrl.Size = new System.Drawing.Size(108, 20);
-            labelLcsUpdateUrl.TabIndex = 5;
-            labelLcsUpdateUrl.Text = "LCS Update Url";
-            // 
-            // labelLcsUrl
-            // 
-            labelLcsUrl.AutoSize = true;
-            labelLcsUrl.Location = new System.Drawing.Point(9, 33);
-            labelLcsUrl.Name = "labelLcsUrl";
-            labelLcsUrl.Size = new System.Drawing.Size(55, 20);
-            labelLcsUrl.TabIndex = 4;
-            labelLcsUrl.Text = "LCS Url";
-            // 
-            // textBoxLcsDiagUrl
-            // 
-            textBoxLcsDiagUrl.Location = new System.Drawing.Point(252, 125);
-            textBoxLcsDiagUrl.Name = "textBoxLcsDiagUrl";
-            textBoxLcsDiagUrl.Size = new System.Drawing.Size(203, 27);
-            textBoxLcsDiagUrl.TabIndex = 3;
-            // 
-            // textBoxLcsFixUrl
-            // 
-            textBoxLcsFixUrl.Location = new System.Drawing.Point(252, 92);
-            textBoxLcsFixUrl.Name = "textBoxLcsFixUrl";
-            textBoxLcsFixUrl.Size = new System.Drawing.Size(203, 27);
-            textBoxLcsFixUrl.TabIndex = 2;
-            // 
-            // textBoxLcsUpdateUrl
-            // 
-            textBoxLcsUpdateUrl.Location = new System.Drawing.Point(252, 59);
-            textBoxLcsUpdateUrl.Name = "textBoxLcsUpdateUrl";
-            textBoxLcsUpdateUrl.Size = new System.Drawing.Size(203, 27);
-            textBoxLcsUpdateUrl.TabIndex = 1;
-            // 
-            // textBoxLcsUrl
-            // 
-            textBoxLcsUrl.Location = new System.Drawing.Point(252, 26);
-            textBoxLcsUrl.Name = "textBoxLcsUrl";
-            textBoxLcsUrl.Size = new System.Drawing.Size(203, 27);
-            textBoxLcsUrl.TabIndex = 0;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(addExternalIpAddress);
-            groupBox1.Location = new System.Drawing.Point(11, 549);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(461, 69);
-            groupBox1.TabIndex = 11;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Microsoft-hosted environments";
-            // 
-            // addExternalIpAddress
-            // 
-            addExternalIpAddress.Location = new System.Drawing.Point(9, 26);
+            vmRefreshComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            vmRefreshComboBox.Items.AddRange(new object[] { "Every 5 minutes", "Every 15 minutes", "Every 30 minutes", "Every 60 minutes", "Only with Refresh (F5)" });
+            vmRefreshComboBox.Name = "vmRefreshComboBox";
+            vmRefreshComboBox.Size = new System.Drawing.Size(200, 28);
+            azureVmStateCheckBox.Name = "azureVmStateCheckBox";
+            azureVmStateCheckBox.Text = "Show the real VM state from Azure";
             addExternalIpAddress.Name = "addExternalIpAddress";
-            addExternalIpAddress.Size = new System.Drawing.Size(363, 31);
-            addExternalIpAddress.TabIndex = 2;
             addExternalIpAddress.Text = "Add external IP when creating firewall exception";
-            // 
+            //
+            // ClearCacheButton
+            //
+            ClearCacheButton.Name = "ClearCacheButton";
+            ClearCacheButton.Size = new System.Drawing.Size(120, 32);
+            ClearCacheButton.Text = "Clear cache";
+            ClearCacheButton.Click += ClearCacheButton_Click;
+            //
+            // text boxes
+            //
+            textBoxProjectExcl.Name = "textBoxProjectExcl";
+            textBoxProjectExcl.Size = new System.Drawing.Size(200, 27);
+            textBoxLcsUrl.Name = "textBoxLcsUrl";
+            textBoxLcsUrl.Size = new System.Drawing.Size(260, 27);
+            textBoxLcsUpdateUrl.Name = "textBoxLcsUpdateUrl";
+            textBoxLcsUpdateUrl.Size = new System.Drawing.Size(260, 27);
+            textBoxLcsFixUrl.Name = "textBoxLcsFixUrl";
+            textBoxLcsFixUrl.Size = new System.Drawing.Size(260, 27);
+            textBoxLcsDiagUrl.Name = "textBoxLcsDiagUrl";
+            textBoxLcsDiagUrl.Size = new System.Drawing.Size(260, 27);
+            //
             // Parameters
-            // 
-            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            //
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(487, 845);
-            Controls.Add(groupBox1);
-            Controls.Add(groupBoxLCSUrls);
-            Controls.Add(groupBoxCredentials);
-            Controls.Add(groupBoxUIConfig);
-            Controls.Add(groupBoxCaching);
-            Controls.Add(groupBoxExportConfig);
-            Controls.Add(groupCHE);
-            Controls.Add(closeButton);
+            ClientSize = new System.Drawing.Size(640, 720);
+            Controls.Add(page);
+            Controls.Add(footer);
             Icon = Properties.Resources.favicon_blue;
             MaximizeBox = false;
             MinimizeBox = false;
+            MinimumSize = new System.Drawing.Size(520, 420);
             Name = "Parameters";
             ShowInTaskbar = false;
-            SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            Text = "Parameters";
+            Text = "Settings";
             Load += Parameters_Load;
-            groupBoxExportConfig.ResumeLayout(false);
-            groupBoxExportConfig.PerformLayout();
-            groupBoxUIConfig.ResumeLayout(false);
-            groupBoxUIConfig.PerformLayout();
-            groupBoxCaching.ResumeLayout(false);
-            groupBoxCaching.PerformLayout();
-            groupCHE.ResumeLayout(false);
-            groupBoxCredentials.ResumeLayout(false);
-            groupBoxLCSUrls.ResumeLayout(false);
-            groupBoxLCSUrls.PerformLayout();
-            groupBox1.ResumeLayout(false);
+            footer.ResumeLayout(false);
             ResumeLayout(false);
-        }
-
-        private void CachingEnabledCheckbox_Click(object sender, System.EventArgs e)
-        {
-            throw new System.NotImplementedException();
         }
 
         #endregion
 
-        private System.Windows.Forms.CheckBox AutoRefreshCheckBox;
+        private LCS.Theming.SettingsPage page;
+        private System.Windows.Forms.Panel footer;
         private System.Windows.Forms.Button closeButton;
-        private System.Windows.Forms.GroupBox groupBoxExportConfig;
-        private System.Windows.Forms.Label labelOrgNameExcl;
-        private System.Windows.Forms.TextBox textBoxProjectExcl;
-        private System.Windows.Forms.GroupBox groupBoxUIConfig;
-        private System.Windows.Forms.GroupBox groupBoxCaching;
-        private System.Windows.Forms.CheckBox StoreCacheCheckBox;
-        private System.Windows.Forms.CheckBox CachingEnabledCheckbox;
+        private System.Windows.Forms.ComboBox themeComboBox;
+        private LCS.Theming.ToggleSwitch keepSessionAliveCheckBox;
+        private LCS.Theming.ToggleSwitch AutoRefreshCheckBox;
+        private LCS.Theming.ToggleSwitch minimizeToNotificationArea;
+        private LCS.Theming.ToggleSwitch CachingEnabledCheckbox;
+        private LCS.Theming.ToggleSwitch StoreCacheCheckBox;
         private System.Windows.Forms.Button ClearCacheButton;
-        private System.Windows.Forms.CheckBox minimizeToNotificationArea;
-        private System.Windows.Forms.GroupBox groupCHE;
-        private System.Windows.Forms.CheckBox alwaysLogAsAdmin;
-        private System.Windows.Forms.CheckBox uriSchemeEnabled;
-        private System.Windows.Forms.GroupBox groupBoxCredentials;
-        private System.Windows.Forms.CheckBox RDPCredentialsCheckbox;
-        private System.Windows.Forms.CheckBox LocalCredentialsCheckbox;
-        private System.Windows.Forms.GroupBox groupBoxLCSUrls;
-        private System.Windows.Forms.Label labelLcsUrl;
-        private System.Windows.Forms.TextBox textBoxLcsDiagUrl;
-        private System.Windows.Forms.TextBox textBoxLcsFixUrl;
-        private System.Windows.Forms.TextBox textBoxLcsUpdateUrl;
+        private System.Windows.Forms.TextBox textBoxProjectExcl;
+        private LCS.Theming.ToggleSwitch RDPCredentialsCheckbox;
+        private LCS.Theming.ToggleSwitch LocalCredentialsCheckbox;
+        private LCS.Theming.ToggleSwitch alwaysLogAsAdmin;
+        private LCS.Theming.ToggleSwitch uriSchemeEnabled;
+        private LCS.Theming.ToggleSwitch addExternalIpAddress;
+        private LCS.Theming.ToggleSwitch azureVmStateCheckBox;
+        private System.Windows.Forms.ComboBox vmRefreshComboBox;
         private System.Windows.Forms.TextBox textBoxLcsUrl;
-        private System.Windows.Forms.Label labelLcsDiagUrl;
-        private System.Windows.Forms.Label labelLcsFixUrl;
-        private System.Windows.Forms.Label labelLcsUpdateUrl;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.CheckBox addExternalIpAddress;
+        private System.Windows.Forms.TextBox textBoxLcsUpdateUrl;
+        private System.Windows.Forms.TextBox textBoxLcsFixUrl;
+        private System.Windows.Forms.TextBox textBoxLcsDiagUrl;
     }
 }

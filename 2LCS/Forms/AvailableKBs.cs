@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class AvailableKBs : Form
+    public partial class AvailableKBs : LCS.Theming.ThemedForm
     {
         public List<Hotfix> Hotfixes;
         private readonly BindingSource _hotfixesSource = new BindingSource();

@@ -44,9 +44,6 @@
     <RepositoryUrl>https://github.com/microsoft/2LCS</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="ExtendedWebBrowser.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -73,17 +70,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="SHDocVw">
-      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>1</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="favicon-blue.ico" />
     <Content Include="favicon-white.ico" />
     <Content Include="Third Party Notices.txt">
@@ -92,6 +78,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
+    <PackageReference Include="Azure.Identity.Broker" Version="1.7.0" />
     <PackageReference Include="CsvHelper">
       <Version>33.0.1</Version>
     </PackageReference>
@@ -101,6 +89,7 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.72</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Linq.Dynamic.Core">
       <Version>1.6.1</Version>

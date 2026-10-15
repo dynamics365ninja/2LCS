@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LCS.Forms
 {
-    public partial class PowerShell : Form
+    public partial class PowerShell : LCS.Theming.ThemedForm
     {
         public PowerShell()
         {
