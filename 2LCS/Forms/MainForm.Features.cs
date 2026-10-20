@@ -142,13 +142,27 @@ namespace LCS.Forms
                 _cmdLogon.Enabled = instances.Any(i => i.NavigationLinks?.Any(l => l.DisplayName == "Log on to environment") == true);
                 _cmdConnect.Visible = che || saasOpenRdpConnectionToolStripMenuItem.Visible;
                 _cmdConnect.Enabled = instances.Count == 1 || che;
-                _cmdStart.Enabled = instances.Any(i => i.CanStart);
-                _cmdStop.Enabled = instances.Any(i => i.CanStop);
+                _cmdStart.Enabled = instances.Any(i => IsRunning(i) == false);
+                _cmdStop.Enabled = instances.Any(i => IsRunning(i) == true);
             }
             if (DetailsVisible)
             {
                 _details?.SetEnvironments(instances, instance => _httpClientHelper?.GetEnvironmentDetailsUrl(instance));
             }
+        }
+
+        // Azure VM state when known, otherwise the LCS deployment status; null = neither start nor stop.
+        private static bool? IsRunning(CloudHostedInstance instance)
+        {
+            // LCS offers no start/stop (e.g. production) or an operation is in progress.
+            if (!instance.CanStart && !instance.CanStop) return null;
+            if (instance.VmStateChanging) return null;
+            if (instance.VmState == VmState.AzureVmStateService.Running) return true;
+            if (instance.VmState == VmState.AzureVmStateService.Stopped) return false;
+            var status = (instance.DeploymentStatus ?? string.Empty).Trim().ToLowerInvariant();
+            if (status == "deployed") return true;
+            if (status.StartsWith("stopped") || status.StartsWith("deallocated")) return false;
+            return null;
         }
 
         private static bool LcsSession_HasCookies() => Auth.LcsSession.Current.HasCookies;

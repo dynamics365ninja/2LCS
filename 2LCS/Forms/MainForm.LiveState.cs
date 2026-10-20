@@ -229,14 +229,6 @@ namespace LCS.Forms
                 {
                     Notify(InfoSeverity.Success, "Signed in to Azure", "2LCS now shows the real state of the virtual machines and keeps it up to date.");
                 }
-
-                var mismatches = instances.Where(i => i.VmStateMismatch).Select(i => i.DisplayName).ToList();
-                if (mismatches.Count > 0 && !allowInteraction && _infoBar != null && !_infoBar.Visible)
-                {
-                    _infoBar.Show(InfoSeverity.Warning, "LCS shows an outdated state",
-                        $"{string.Join(", ", mismatches)}: the virtual machine state in Azure differs from LCS. See the VM State (Azure) column.",
-                        autoClose: TimeSpan.FromSeconds(20));
-                }
             }
             catch (Exception)
             {
